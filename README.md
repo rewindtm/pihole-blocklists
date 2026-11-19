@@ -1,24 +1,26 @@
 # Pi-hole Blocklists
 
-Un unico file hosts che unisce i domini di tutte le liste elencate in [`adlists.txt`](adlists.txt) (generali, pubblicità, tracking/telemetria, malware/phishing, altri), deduplicati.
+Liste hosts unificate e deduplicate, generate a partire dalle sorgenti elencate in [`adlists.txt`](adlists.txt) (generali, pubblicità, tracking/telemetria, malware/phishing, altri).
 
 ## File
 
-- [`merged-hosts.txt.gz`](merged-hosts.txt.gz) — file hosts unico e compresso (formato `0.0.0.0 dominio`), **~6,35 milioni di domini unici**, ~204 MB decompresso / ~31 MB compresso. La dimensione è dovuta soprattutto alla lista Prigent-Adult (~4,6 milioni di voci).
-- [`adlists.txt`](adlists.txt) — elenco delle sorgenti originali usate per generare il file unificato.
+- [`merged-hosts.txt.gz`](merged-hosts.txt.gz) — lista principale (formato `0.0.0.0 dominio`), **1.778.510 domini unici**, esclude le fonti per contenuti adulti.
+- [`adult-hosts.txt.gz`](adult-hosts.txt.gz) — lista separata solo per il blocco contenuti per adulti (Prigent-Adult + pi_blocklist_porn_top1m), **4.596.350 domini unici**. Da usare solo se vuoi anche questo blocco, aggiungendola come lista extra.
+- [`adlists.txt`](adlists.txt) — elenco delle sorgenti originali usate per generare i file unificati.
 
 ## Utilizzo
 
-1. Scarica e decomprimi il file:
+1. Scarica e decomprimi il/i file che ti interessano:
    ```bash
    curl -L -o merged-hosts.txt.gz https://raw.githubusercontent.com/rewindtm/pihole-blocklists/master/merged-hosts.txt.gz
    gunzip merged-hosts.txt.gz
+   # opzionale, solo se vuoi anche il blocco adult:
+   curl -L -o adult-hosts.txt.gz https://raw.githubusercontent.com/rewindtm/pihole-blocklists/master/adult-hosts.txt.gz
+   gunzip adult-hosts.txt.gz
    ```
-2. Su Pi-hole puoi importarlo come lista locale (es. copiandolo in `/etc/pihole/local.list` o aggiungendolo come file custom in **Group Management > Adlists** servendolo da un web server locale), oppure usarlo come file hosts di sistema.
+2. Su Pi-hole puoi importarli come liste locali (es. servendoli da un web server locale e aggiungendoli come Adlist custom in **Group Management > Adlists**), oppure usarli come file hosts di sistema.
 3. Vai su **Tools > Update Gravity** per applicare.
 
-> Nota: data la dimensione (milioni di voci), valuta se escludere la lista adult/porn se non necessaria, per ridurre drasticamente il peso del file e il tempo di elaborazione di Gravity.
+## Rigenerare i file
 
-## Rigenerare il file
-
-Le liste sorgente vengono scaricate, i domini estratti (sia da hosts-file che da liste "plain domain") e uniti con `sort -u`, poi compressi con `gzip -9`.
+Le liste sorgente vengono scaricate, i domini estratti (sia da hosts-file che da liste "plain domain") con `extract.awk`, separati in principale/adult in base alla fonte, uniti con `sort -u` e compressi con `gzip -9`.
