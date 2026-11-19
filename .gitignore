@@ -1,4 +1,5 @@
 raw/
 domains_sorted.txt
-merged-hosts.txt
-extract.awk
+domains_main.txt
+domains_adult.txt
+adult-hosts.txt
